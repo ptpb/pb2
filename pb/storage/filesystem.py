@@ -1,13 +1,12 @@
 from os import path
 
 import aiofiles
-from mimetypes import guess_type
 from xdg import BaseDirectory
 
-from pb.utils.hash import hash_function
-from pb.utils.datetime import now
-from pb.utils.json import JSONEncoder
 from pb.models.paste import Paste
+from pb.utils.datetime import now
+from pb.utils.hash import hash_function
+from pb.utils.json import JSONEncoder
 
 
 base_directory = BaseDirectory.save_data_path('pb', 'paste')

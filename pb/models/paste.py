@@ -1,7 +1,7 @@
 from base64 import urlsafe_b64encode
 from uuid import uuid4
 
-from attr import attributes, attrib, asdict
+from attr import asdict, attrib, attributes
 
 
 @attributes
@@ -24,7 +24,7 @@ class Paste:
         return asdict(self)
 
     def _default_label(self, length):
-        assert self.digest != None
+        assert self.digest is not None
 
         return urlsafe_b64encode(self.digest)[:length].decode('utf-8')
 

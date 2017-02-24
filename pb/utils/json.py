@@ -1,27 +1,26 @@
-from binascii import hexlify, unhexlify
 import json
-
+import uuid
+from binascii import hexlify, unhexlify
 from datetime import datetime, timezone
 from functools import partial
-from json import JSONEncoder as _JSONEncoder, JSONDecoder as _JSONDecoder
-from uuid import UUID
 
 
-class JSONEncoder(_JSONEncoder):
+class JSONEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, UUID):
+        if isinstance(obj, uuid.UUID):
             return {'__uuid__': True, 'hex': obj.hex}
         if isinstance(obj, datetime):
             return {'__datetime__': True, 'timestamp': obj.timestamp()}
         if isinstance(obj, bytes):
-            return {'__bytes__': True, 'hex': hexlify(obj).decode('utf-8')}
+            return {'__bytes__': True, 'hex':
+                    hexlify(obj).decode('utf-8')}
 
         return super().default(obj)
 
 
 def object_hook(dct):
     if '__uuid__' in dct:
-        return UUID(hex=dct['hex'])
+        return uuid.UUID(hex=dct['hex'])
 
     if '__datetime__' in dct:
         dt = datetime.utcfromtimestamp(dct['timestamp'])
@@ -33,4 +32,4 @@ def object_hook(dct):
     return dct
 
 
-JSONDecoder = partial(_JSONDecoder, object_hook=object_hook)
+JSONDecoder = partial(json.JSONDecoder, object_hook=object_hook)
