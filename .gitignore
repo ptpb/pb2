@@ -13,5 +13,5 @@ ChangeLog
 .idea/
 .tox/
 .eggs/
-.coverage.*
+.coverage*
 .python-version

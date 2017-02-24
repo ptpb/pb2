@@ -1,5 +1,6 @@
-from datetime import datetime, timezone
 import uuid
+from datetime import datetime, timezone
+from json import loads
 
 import pytest
 
@@ -26,7 +27,8 @@ def json():
     )
 ])
 def test_encode(json, json_input, native):
-    assert json.encode(native) == json_input
+    # this is a little odd, because the json object is not ordered
+    assert loads(json.encode(native)) == loads(json_input)
 
 
 def test_encode_fallback(json):
