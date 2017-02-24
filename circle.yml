@@ -4,7 +4,7 @@ machine:
 
 dependencies:
   override:
-    - pip install -r ci-requirements
+    - pip install -r ci-requirements.txt
     - pyenv local 3.5.2 3.6.0
 
 test:
