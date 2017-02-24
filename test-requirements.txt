@@ -1,0 +1,4 @@
+# flake8
+flake8
+pep8-naming>=0.4.1
+flake8-import-order>=0.8
