@@ -1,9 +1,8 @@
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 
 def now():
     dt = datetime.utcnow()
-    dt.replace(tzinfo=timezone.utc)
+    dt = dt.replace(tzinfo=timezone.utc)
 
     return dt
