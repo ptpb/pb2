@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime, timezone
 
-import pytest
 from msgpack import ExtType
+import pytest
 
 from pb.utils import msgpack
 

@@ -1,8 +1,8 @@
 import enum
-import uuid
 import struct
-from functools import partial
+import uuid
 from datetime import datetime, timezone
+from functools import partial
 
 import msgpack
 
