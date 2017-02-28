@@ -1,18 +1,13 @@
 from aiohttp import web
 
-from pb.storage import filesystem
-
-
-storage_impl = filesystem
-
 
 class ObjectView(web.View):
     async def get(self):
-
+        storage = self.request.app['storage']
         stream = web.StreamResponse()
         await stream.prepare(self.request)
 
-        await storage_impl.stub(
-            self.request.match_info['name'], stream)
+        await storage.read_object(
+            self.request.match_info['name'], stream.write)
 
         return stream

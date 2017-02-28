@@ -1,15 +1,9 @@
-from mimetypes import guess_type
-
 from aiohttp import web
-
-from pb.storage import filesystem
-
-
-storage_impl = filesystem
 
 
 class ObjectsView(web.View):
     async def post(self):
+        storage = self.request.app['storage']
         reader = await self.request.multipart()
 
         while True:
@@ -17,12 +11,8 @@ class ObjectsView(web.View):
             if not body_part:
                 break
 
-            paste = await storage_impl.write_body(body_part)
-            paste.generate_label(
-                label=self.request.match_info.get('name'))
-            paste.mimetype, _ = guess_type(body_part.filename)
-
-            await storage_impl.write_metadata(paste)
+            paste = await storage.create_object(body_part.read_chunk)
+            #paste.mimetype, _ = guess_type(body_part.filename)
 
             print(paste)
 

@@ -5,12 +5,14 @@ import sys
 from aiohttp import web
 
 from pb.routes import setup_routes
+from pb.storage.base import setup_storage
 
 
 def init(loop, argv):
     app = web.Application(loop=loop)
 
     setup_routes(app)
+    setup_storage(app)
 
     return app
 
