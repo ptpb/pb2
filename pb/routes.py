@@ -1,5 +1,5 @@
-from pb.views.paste import PasteView
-from pb.views.pastes import PastesView
+from pb.views.object import ObjectView
+from pb.views.objects import ObjectsView
 
 
 def setup_routes(app):

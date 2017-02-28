@@ -3,66 +3,55 @@ from os import path
 import aiofiles
 from xdg import BaseDirectory
 
-from pb.models.paste import Paste
-from pb.utils.datetime import now
-from pb.utils.hash import hash_function
-from pb.utils.json import JSONEncoder
+from pb.storage.base import BaseStorage
+from pb.utils import msgpack
 
 
-base_directory = BaseDirectory.save_data_path('pb', 'paste')
+class FilesystemStorage(BaseStorage):
+    def __init__(self):
+        self.base_directory = BaseDirectory.save_data_path('pb', 'paste')
 
+    def object_path(self, uuid, object_type):
+        filename = '{}.{}'.format(str(uuid), object_type)
 
-async def _write_body(filename, body_part, digest):
-    size = 0
-    async with aiofiles.open(filename, mode='wb') as f:
-        while True:
-            chunk = await body_part.read_chunk()
-            if not chunk:
-                break
+        return path.join(self.base_directory, filename)
 
-            size += len(chunk)
-            digest.update(chunk)
+    async def _write_body(self, uuid, read_chunk, digest):
+        filename = self.object_path(uuid, 'body')
+        size = 0
+        async with aiofiles.open(filename, mode='wb') as f:
+            while True:
+                chunk = await read_chunk()
+                if not chunk:
+                    break
 
-            await f.write(chunk)
+                size += len(chunk)
+                digest.update(chunk)
 
-    return size
+                await f.write(chunk)
 
+        return size
 
-async def write_body(body_part):
+    async def _write_metadata(self, obj_metadata):
+        filename = self.object_path(obj_metadata['uuid'], 'metadata')
+        async with aiofiles.open(filename, mode='wb') as f:
+            packed = msgpack.packb(obj_metadata)
 
-    paste = Paste.create()
-    digest = hash_function()
+            await f.write(packed)
 
-    filename = path.join(base_directory, str(paste.uuid))
-    size = await _write_body(filename, body_part, digest)
+    async def _read_body(self, uuid, write_chunk):
+        filename = self.object_path(uuid, 'body')
+        async with aiofiles.open(filename, mode='rb') as f:
+            while True:
+                chunk = await f.read(8192)
+                if not chunk:
+                    break
 
-    paste.digest = digest.digest()
-    paste.size = size
-    paste.create_dt = now()
+                write_chunk(chunk)
 
-    return paste
+    async def _read_metadata(self, name):
+        filename = self.object_path(name, 'metadata')
+        async with aiofiles.open(filename, mode='rb') as f:
+            packed = await f.read()
 
-
-async def _write_metadata(filename, metadata):
-    async with aiofiles.open(filename, mode='w') as f:
-        await f.write(metadata)
-
-
-async def write_metadata(paste):
-    filename = path.join(base_directory, '{}_metadata'.format(paste.uuid))
-    metadata = JSONEncoder().encode(paste.asdict())
-
-    await _write_metadata(filename, metadata)
-
-
-# fixme: stub
-async def stub(name, stream):
-    filename = path.join(base_directory, name)
-
-    async with aiofiles.open(filename, mode='rb') as f:
-        while True:
-            chunk = await f.read(8192)
-            if not chunk:
-                break
-
-            stream.write(chunk)
+            return msgpack.unpackb(packed)
