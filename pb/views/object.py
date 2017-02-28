@@ -6,7 +6,7 @@ from pb.storage import filesystem
 storage_impl = filesystem
 
 
-class PasteView(web.View):
+class ObjectView(web.View):
     async def get(self):
 
         stream = web.StreamResponse()

@@ -8,7 +8,7 @@ from pb.storage import filesystem
 storage_impl = filesystem
 
 
-class PastesView(web.View):
+class ObjectsView(web.View):
     async def post(self):
         reader = await self.request.multipart()
 
