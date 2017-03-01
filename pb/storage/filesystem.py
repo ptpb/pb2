@@ -3,11 +3,11 @@ from os import path
 import aiofiles
 from xdg import BaseDirectory
 
-from pb.storage.base import BaseStorage
+from pb.storage.base import StreamStorage
 from pb.utils import msgpack
 
 
-class FilesystemStorage(BaseStorage):
+class FilesystemStorage(StreamStorage):
     def __init__(self):
         self.base_directory = BaseDirectory.save_data_path('pb', 'paste')
 
