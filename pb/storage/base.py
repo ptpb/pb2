@@ -7,7 +7,7 @@ from pb.utils.hash import hash_function
 
 class BaseStorage(metaclass=ABCMeta):
     @abstractmethod
-    async def _write_body(self, uuid, read_chunk, digest):
+    async def _write_body(self, uuid, read_chunk, digest):  # pragma: no cover
         return size  # noqa: F821
 
     async def write_body(self, uuid, read_chunk):
@@ -22,7 +22,7 @@ class BaseStorage(metaclass=ABCMeta):
         }
 
     @abstractmethod
-    async def _write_metadata(self, obj_metadata):
+    async def _write_metadata(self, obj_metadata):  # pragma: no cover
         return
 
     async def write_metadata(self, obj):
@@ -39,11 +39,11 @@ class BaseStorage(metaclass=ABCMeta):
         return obj
 
     @abstractmethod
-    async def _read_body(self, uuid, write_chunk):
+    async def _read_body(self, uuid, write_chunk):  # pragma: no cover
         return
 
     @abstractmethod
-    async def _read_metadata(self, name):
+    async def _read_metadata(self, name):  # pragma: no cover
         return obj_metadata  # noqa: F821
 
     async def read_object(self, name, write_chunk):
