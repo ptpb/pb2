@@ -7,6 +7,24 @@ from pb.utils.hash import hash_function
 
 class BaseStorage(metaclass=ABCMeta):
     @abstractmethod
+    async def create_object(self, read_chunk):  # pragma: no cover
+        return obj  # noqa: F821
+
+    @abstractmethod
+    async def read_object(self, name, write_chunk):  # pragma: no cover
+        return obj  # noqa: F821
+
+    #@abstractmethod
+    async def update_object(self):  # pragma: no cover
+        return
+
+    #@abstractmethod
+    async def delete_object(self):  # pragma: no cover
+        return
+
+
+class StreamStorage(BaseStorage, metaclass=ABCMeta):
+    @abstractmethod
     async def _write_body(self, uuid, read_chunk, digest):  # pragma: no cover
         return size  # noqa: F821
 
@@ -53,14 +71,6 @@ class BaseStorage(metaclass=ABCMeta):
         await self._read_body(obj.uuid, write_chunk)
 
         return obj  # fixme?
-
-    #@abstractmethod
-    async def update_object(self):
-        return
-
-    #@abstractmethod
-    async def delete_object(self):
-        return
 
 
 def setup_storage(app):
