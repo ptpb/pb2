@@ -1,6 +1,5 @@
 import uuid
 from datetime import datetime, timezone
-from json import loads
 
 import pytest
 
@@ -25,7 +24,7 @@ test_data = [
 
 @pytest.fixture
 def encoder():
-    return json.JSONEncoder()
+    return json.JSONEncoder(sort_keys=True)
 
 
 @pytest.fixture
@@ -35,8 +34,7 @@ def decoder():
 
 @pytest.mark.parametrize("json_input,native", test_data)
 def test_encode(encoder, json_input, native):
-    # this is a little odd, because the json object is not ordered
-    assert loads(encoder.encode(native)) == loads(json_input)
+    assert encoder.encode(native) == json_input
 
 
 @pytest.mark.parametrize("json_input,native", test_data)
