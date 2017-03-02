@@ -1,8 +1,11 @@
 from aiohttp import web
 
+from pb.response import JSONResponse
+
 
 class ObjectsView(web.View):
     async def post(self):
+        objects = []
         storage = self.request.app['storage']
         reader = await self.request.multipart()
 
@@ -11,9 +14,8 @@ class ObjectsView(web.View):
             if not body_part:
                 break
 
-            paste = await storage.create_object(body_part.read_chunk)
-            #paste.mimetype, _ = guess_type(body_part.filename)
+            obj = await storage.create_object(body_part.read_chunk)
+            #obj.mimetype, _ = guess_type(body_part.filename)
+            objects.append(obj.asdict())
 
-            print(paste)
-
-        return web.Response(text='thx')
+        return JSONResponse(objects)

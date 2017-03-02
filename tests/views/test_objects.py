@@ -1,17 +1,26 @@
+import json
 from unittest.mock import ANY
 
 from aiohttp import multipart
 from asynctest import patch
 
+from pb.models.object import Object
 from pb.storage.base import BaseStorage
 
 
-@patch.object(BaseStorage, 'create_object', return_value={})
+@patch.object(BaseStorage, 'create_object', return_value=Object(uuid=None))
 async def test_object_post(mock_create_object, cli):
     with multipart.MultipartWriter() as writer:
         writer.append('test')
 
-    await cli.post('/objects', data=writer, headers=writer.headers)
+    res = await cli.post('/objects', data=writer, headers=writer.headers)
+    assert res.status == 200
+
+    obj = json.loads(await res.text())
+
+    assert isinstance(obj, list)
+    assert len(obj) == 1
+    assert obj[0]['uuid'] is None
 
     assert mock_create_object.call_count == 1
 
