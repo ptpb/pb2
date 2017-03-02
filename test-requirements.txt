@@ -1,3 +1,6 @@
+# bugs
+-e git://github.com/KeepSafe/aiohttp.git#egg=aiohttp
+
 # coverage
 coverage>=4.3.4
 
