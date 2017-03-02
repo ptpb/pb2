@@ -18,6 +18,18 @@ class JSONEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
+class HumanJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, uuid.UUID):
+            return str(obj)
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        if isinstance(obj, bytes):
+            return hexlify(obj).decode('utf-8')
+
+        return super().default(obj)
+
+
 def object_hook(dct):
     if '__uuid__' in dct:
         return uuid.UUID(hex=dct['hex'])
