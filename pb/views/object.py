@@ -6,10 +6,15 @@ class ObjectView(web.View):
         storage = self.request.app['storage']
 
         response = web.StreamResponse()
+
+        obj = await storage.read_metadata(
+            self.request.match_info['id'])
+
+        response.headers['content-type'] = obj.mimetype
+
         await response.prepare(self.request)
 
-        # fixme: metadata should read before prepare()
-        await storage.read_object(
+        await storage._read_body(
             self.request.match_info['id'], response.write)
 
         return response
