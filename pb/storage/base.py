@@ -25,16 +25,16 @@ class BaseStorage(metaclass=ABCMeta):
 
 class StreamStorage(BaseStorage, metaclass=ABCMeta):
     @abstractmethod
-    async def _write_body(self, uuid, read_chunk, digest):  # pragma: no cover
+    async def _write_body(self, id, read_chunk, digest):  # pragma: no cover
         return size  # noqa: F821
 
-    async def write_body(self, uuid, read_chunk):
+    async def write_body(self, id, read_chunk):
         digest = hash_function()
 
-        size = await self._write_body(uuid, read_chunk, digest)
+        size = await self._write_body(id, read_chunk, digest)
 
         return {
-            'uuid': uuid,
+            'id': id,
             'size': size,
             'digest': digest.digest()
         }
@@ -47,8 +47,8 @@ class StreamStorage(BaseStorage, metaclass=ABCMeta):
         await self._write_metadata(obj.asdict())
 
     async def create_object(self, read_chunk):
-        uuid = uuid4()
-        body_metadata = await self.write_body(uuid, read_chunk)
+        id = uuid4()
+        body_metadata = await self.write_body(id, read_chunk)
 
         obj = Object.create(**body_metadata)
 
@@ -57,7 +57,7 @@ class StreamStorage(BaseStorage, metaclass=ABCMeta):
         return obj
 
     @abstractmethod
-    async def _read_body(self, uuid, write_chunk):  # pragma: no cover
+    async def _read_body(self, id, write_chunk):  # pragma: no cover
         return
 
     @abstractmethod
@@ -68,7 +68,7 @@ class StreamStorage(BaseStorage, metaclass=ABCMeta):
         obj_metadata = await self._read_metadata(name)
         obj = Object(**obj_metadata)
 
-        await self._read_body(obj.uuid, write_chunk)
+        await self._read_body(obj.id, write_chunk)
 
         return obj  # fixme?
 
