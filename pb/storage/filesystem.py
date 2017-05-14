@@ -9,15 +9,15 @@ from pb.utils import msgpack
 
 class FilesystemStorage(StreamStorage):
     def __init__(self):
-        self.base_directory = BaseDirectory.save_data_path('pb', 'paste')
+        self.base_directory = BaseDirectory.save_data_path('pb', 'object')
 
-    def object_path(self, uuid, object_type):
-        filename = '{}.{}'.format(str(uuid), object_type)
+    def object_path(self, id, object_type):
+        filename = '{}.{}'.format(str(id), object_type)
 
         return path.join(self.base_directory, filename)
 
-    async def _write_body(self, uuid, read_chunk, digest):
-        filename = self.object_path(uuid, 'body')
+    async def _write_body(self, id, read_chunk, digest):
+        filename = self.object_path(id, 'body')
         size = 0
         async with aiofiles.open(filename, mode='wb') as f:
             while True:
@@ -33,14 +33,14 @@ class FilesystemStorage(StreamStorage):
         return size
 
     async def _write_metadata(self, obj_metadata):
-        filename = self.object_path(obj_metadata['uuid'], 'metadata')
+        filename = self.object_path(obj_metadata['id'], 'metadata')
         async with aiofiles.open(filename, mode='wb') as f:
             packed = msgpack.packb(obj_metadata)
 
             await f.write(packed)
 
-    async def _read_body(self, uuid, write_chunk):
-        filename = self.object_path(uuid, 'body')
+    async def _read_body(self, id, write_chunk):
+        filename = self.object_path(id, 'body')
         async with aiofiles.open(filename, mode='rb') as f:
             while True:
                 chunk = await f.read(8192)

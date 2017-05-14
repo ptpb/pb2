@@ -1,6 +1,6 @@
 from functools import partial
 
-from aiohttp.web_reqrep import json_response
+from aiohttp.web_response import json_response
 
 from pb.utils.json import HumanJSONEncoder
 

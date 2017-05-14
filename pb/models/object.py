@@ -1,13 +1,40 @@
 from base64 import urlsafe_b64encode
+from binascii import hexlify, unhexlify
 
 from attr import asdict, attrib, attributes
+from marshmallow_jsonapi import Schema, fields
 
 from pb.utils import datetime
 
 
+class Digest(fields.String):
+    default_error_messages = {
+        'invalid_digest': 'Not a valid digest.'
+    }
+
+    def _validated(self, value):
+        if value is None:
+            return None
+        if isinstance(value, bytes):
+            return value
+        try:
+            unhexlify(value.encode('utf-8'))
+        except ValueError:
+            self.fail('invalid_digest')
+
+    def _serialize(self, value, attr, obj):
+        if value is None:
+            return None
+
+        return hexlify(value).decode('utf-8')
+
+    def _deserialize(self, value, attr, data):
+        return self._validated(value)
+
+
 @attributes
 class Object:
-    uuid = attrib()
+    id = attrib()
     label = attrib(default=None)
     digest = attrib(default=None, repr=False)
 
@@ -18,9 +45,9 @@ class Object:
     expire_dt = attrib(default=None)
 
     @classmethod
-    def create(cls, uuid, digest, **kwargs):
+    def create(cls, id, digest, **kwargs):
         obj = cls(
-            uuid=uuid,
+            id=id,
             digest=digest,
             create_dt=datetime.now(),
             **kwargs
@@ -45,3 +72,19 @@ class Object:
             self.label = self._default_label(length)
 
         return self.label
+
+
+class ObjectSchema(Schema):
+    id = fields.UUID()
+    label = fields.String()
+    digest = Digest()
+
+    size = fields.Integer()
+    mimetype = fields.String()
+
+    create_dt = fields.DateTime()
+    expire_dt = fields.DateTime()
+
+    class Meta:
+        type_ = 'paste'
+        strict = True

@@ -1,21 +1,21 @@
-from aiohttp import web
+from functools import partial
 
-from pb.response import JSONResponse
+from aiohttp import web
+from aiohttp.web_response import json_response
+
+from pb.models.object import ObjectSchema
+
+
+schema = ObjectSchema()
 
 
 class ObjectsView(web.View):
     async def post(self):
-        objects = []
         storage = self.request.app['storage']
-        reader = await self.request.multipart()
 
-        while True:
-            body_part = await reader.next()
-            if not body_part:
-                break
+        read_chunk = partial(self.request.content.read, 8192)
+        obj = await storage.create_object(read_chunk)
 
-            obj = await storage.create_object(body_part.read_chunk)
-            #obj.mimetype, _ = guess_type(body_part.filename)
-            objects.append(obj.asdict())
+        result = schema.dump(obj)
 
-        return JSONResponse(objects)
+        return json_response(result.data)
