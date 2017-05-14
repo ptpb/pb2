@@ -1,5 +1,4 @@
 import json
-from unittest.mock import ANY
 
 from aiohttp import multipart
 from asynctest import patch
@@ -24,9 +23,9 @@ async def test_object_post(mock_create_object, cli):
     assert mock_create_object.call_count == 1
 
 
-@patch.object(BaseStorage, 'read_object', return_value=Object(id=None))
+@patch.object(BaseStorage, 'read_metadata', return_value=Object(id=None))
 async def test_object_get(mock_read_object, cli):
     await cli.get('/objects/foo')
 
     assert mock_read_object.call_count == 1
-    mock_read_object.assert_called_once_with('foo', ANY)
+    mock_read_object.assert_called_once_with('foo')

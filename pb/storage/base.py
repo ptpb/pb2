@@ -12,7 +12,15 @@ class BaseStorage(metaclass=ABCMeta):
 
     @abstractmethod
     async def read_object(self, name, write_chunk):  # pragma: no cover
+        return
+
+    @abstractmethod
+    async def read_metadata(self, name):  # pragma: no cover
         return obj  # noqa: F821
+
+    @abstractmethod
+    async def write_metadata(self, obj):  # pragma: no cover
+        return
 
     #@abstractmethod
     async def update_object(self):  # pragma: no cover
@@ -69,11 +77,9 @@ class StreamStorage(BaseStorage, metaclass=ABCMeta):
         return Object(**obj_metadata)
 
     async def read_object(self, name, write_chunk):
-        obj = await self.read_metadata(name)
+        #obj = await self.read_metadata(name)
 
-        await self._read_body(obj.id, write_chunk)
-
-        return obj  # fixme?
+        await self._read_body(name, write_chunk)
 
 
 def setup_storage(app):

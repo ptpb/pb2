@@ -36,7 +36,8 @@ async def test_read_object(afs, storage, digest):
     bio = BytesIO()
 
     obj1 = await storage.create_object(read_chunk(body))
-    obj2 = await storage.read_object(obj1.id, bio.write)
+    obj2 = await storage.read_metadata(obj1.id)
+    await storage.read_object(obj1.id, bio.write)
 
     assert obj1 == obj2
     assert bio.getvalue() == body

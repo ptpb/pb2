@@ -10,11 +10,12 @@ class ObjectView(web.View):
         obj = await storage.read_metadata(
             self.request.match_info['id'])
 
-        response.headers['content-type'] = obj.mimetype
+        if obj.mimetype is not None:
+            response.headers['content-type'] = obj.mimetype
 
         await response.prepare(self.request)
 
-        await storage._read_body(
+        await storage.read_object(
             self.request.match_info['id'], response.write)
 
         return response
