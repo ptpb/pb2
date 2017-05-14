@@ -73,16 +73,24 @@ class Object:
 
         return self.label
 
+    def update(self, **kwargs):
+        for key, value in kwargs.items():
+            try:
+                getattr(self, key)
+            except AttributeError:
+                continue
+            setattr(self, key, value)
+
 
 class ObjectSchema(Schema):
-    id = fields.UUID()
+    id = fields.UUID(dump_only=True)
     label = fields.String()
-    digest = Digest()
+    digest = Digest(dump_only=True)
 
-    size = fields.Integer()
+    size = fields.Integer(dump_only=True)
     mimetype = fields.String()
 
-    create_dt = fields.DateTime()
+    create_dt = fields.DateTime(dump_only=True)
     expire_dt = fields.DateTime()
 
     class Meta:

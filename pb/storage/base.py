@@ -64,9 +64,12 @@ class StreamStorage(BaseStorage, metaclass=ABCMeta):
     async def _read_metadata(self, name):  # pragma: no cover
         return obj_metadata  # noqa: F821
 
-    async def read_object(self, name, write_chunk):
+    async def read_metadata(self, name):
         obj_metadata = await self._read_metadata(name)
-        obj = Object(**obj_metadata)
+        return Object(**obj_metadata)
+
+    async def read_object(self, name, write_chunk):
+        obj = await self.read_metadata(name)
 
         await self._read_body(obj.id, write_chunk)
 
